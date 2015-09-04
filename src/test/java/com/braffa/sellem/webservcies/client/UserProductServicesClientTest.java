@@ -20,6 +20,7 @@ import com.braffa.sellem.model.xml.authentication.XmlRegisteredUser;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUserMsg;
 import com.braffa.sellem.model.xml.product.XmlProduct;
 import com.braffa.sellem.model.xml.product.XmlProductMsg;
+import com.braffa.sellem.model.xml.product.XmlUsersProductMsg;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class UserProductServicesClientTest {
@@ -72,14 +73,32 @@ public class UserProductServicesClientTest {
 		}
 		return null;
 	}
+	
+	private XmlUsersProductMsg getXmlUsersProductMsg (String xmlStr) {
+		try {
+			StringReader reader = new StringReader(xmlStr);
+			JAXBContext jaxbContext = JAXBContext
+					.newInstance(XmlUsersProductMsg.class);
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			XmlUsersProductMsg xmlUsersProductMsg = (XmlUsersProductMsg) jaxbUnmarshaller.unmarshal(reader);
+			return xmlUsersProductMsg;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	@Test
 	public void findUsersByProductIdTest() {
 		String xmlStr = userProductServicesClient.findUsersByProductId("9780789724410");
 		System.out.println(xmlStr);
-		List lOfRegisteredUsers = getLOfRegisteredUsers(xmlStr);
-		assertEquals("products returned should be ", 2, lOfRegisteredUsers.size());
+		XmlUsersProductMsg xmlUsersProductMsg = getXmlUsersProductMsg(xmlStr);
 
+		System.out.println(xmlUsersProductMsg.getProduct().toString());
+		
+		List lOfXmlUsersLinkedToProduct = xmlUsersProductMsg.getlOfXmlUsersLinkedToProduct();
+
+		assertEquals("Expect 2 UsersLinkedToProduct ", 2, lOfXmlUsersLinkedToProduct.size());
 	}
 
 

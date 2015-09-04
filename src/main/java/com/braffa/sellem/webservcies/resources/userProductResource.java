@@ -20,6 +20,7 @@ import com.braffa.sellem.model.xml.authentication.XmlRegisteredUserMsg;
 import com.braffa.sellem.model.xml.product.XmlProductMsg;
 import com.braffa.sellem.model.xml.product.XmlUserToProduct;
 import com.braffa.sellem.model.xml.product.XmlUserToProductMsg;
+import com.braffa.sellem.model.xml.product.XmlUsersProductMsg;
 import com.braffa.sellem.webservcies.IUserToProductWebService;
 import com.braffa.sellem.webservcies.services.UserProductServices;
 import com.braffa.sellem.webservcies.services.UserToProductService;
@@ -48,15 +49,15 @@ public class userProductResource {
 	}
 	
 	@GET
-	@Path("/finduserbyproductid/{productId}")
+	@Path("/findusersbyproductid/{productId}")
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces(MediaType.TEXT_XML)
-	public XmlRegisteredUserMsg findUserByProductid(@PathParam("productId") String productId) {
+	public XmlUsersProductMsg findUsersByProductid(@PathParam("productId") String productId) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("find");
 		}
 		try {
-			return UserProductServices.getInstance().getUserByProduct(productId);
+			return UserProductServices.getInstance().getUsersByProductId(productId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

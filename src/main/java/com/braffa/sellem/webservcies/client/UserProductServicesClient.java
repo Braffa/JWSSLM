@@ -7,7 +7,7 @@ public class UserProductServicesClient extends BaseClient {
 	private static final Logger logger = Logger.getLogger(UserProductServicesClient.class);
 	
 	static final String FIND_USER_PRODUCTS_URL = "/userproduct/finduserproducts/";
-	static final String FIND_USER_BY_PRODUCT_ID_URL = "/userproduct/finduserbyproductid/";
+	static final String FIND_USER_BY_PRODUCT_ID_URL = "/userproduct/findusersbyproductid/";
 	
 	
 	public String getUserCatalogue (String userId) {

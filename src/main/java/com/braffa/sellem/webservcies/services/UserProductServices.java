@@ -12,6 +12,7 @@ import com.braffa.sellem.hbn.DaoFactory;
 import com.braffa.sellem.hbn.DaoFactory.daoType;
 import com.braffa.sellem.model.hbn.entity.Login;
 import com.braffa.sellem.model.hbn.entity.Product;
+import com.braffa.sellem.model.xml.authentication.XmlLogin;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUser;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUserMsg;
 import com.braffa.sellem.model.xml.product.XmlProduct;
@@ -21,11 +22,11 @@ import com.braffa.sellem.model.xml.product.XmlUserToProduct;
 import com.braffa.sellem.model.xml.product.XmlUserToProductMsg;
 import com.braffa.sellem.model.xml.product.XmlUsersProductMsg;
 
-public class UserProductServices  {
+public class UserProductServices {
 
 	private static final Logger logger = Logger
 			.getLogger(UserProductServices.class);
-	
+
 	private XmlUserToProductMsg xmlUserToProductMsg;
 
 	public static UserProductServices userToProductService = new UserProductServices();
@@ -33,8 +34,9 @@ public class UserProductServices  {
 	public static UserProductServices getInstance() {
 		return userToProductService;
 	}
-	
-	private XmlUserToProductMsg getXmlUserToProductMsg (String userId, String productId, String productIndex) {
+
+	private XmlUserToProductMsg getXmlUserToProductMsg(String userId,
+			String productId, String productIndex) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("getXmlUserToProductMsg");
 		}
@@ -62,26 +64,29 @@ public class UserProductServices  {
 		xmlUserToProductMsg.setSearchField("USERID");
 		Dao userToProductDao = DaoFactory.getDAO(daoType.USER_TO_PRODUCT_DAO,
 				xmlUserToProductMsg);
-		XmlUserToProductMsg userToProductMsg =   (XmlUserToProductMsg) userToProductDao.search();
-		List<XmlUserToProduct> lOfUserToProduct =  userToProductMsg.getLOfXmlUserToProduct();
-		
+		XmlUserToProductMsg userToProductMsg = (XmlUserToProductMsg) userToProductDao
+				.search();
+		List<XmlUserToProduct> lOfUserToProduct = userToProductMsg
+				.getLOfXmlUserToProduct();
+
 		if (lOfUserToProduct.size() > 0) {
 			XmlProductMsg productMsg = new XmlProductMsg();
 			ArrayList<XmlProduct> lOfProducts = new ArrayList<XmlProduct>();
-			for (XmlUserToProduct userToProduct : lOfUserToProduct) { 
+			for (XmlUserToProduct userToProduct : lOfUserToProduct) {
 				XmlProduct product = new XmlProduct();
 				product.setProductid(userToProduct.getProductId());
 				lOfProducts.add(product);
 			}
 			productMsg.setLOfProducts(lOfProducts);
 			Dao productDao = DaoFactory.getDAO(daoType.PRODUCT_DAO, productMsg);
-			XmlProductMsg xmlProductMsg = (XmlProductMsg)productDao.readListOfKeys();
+			XmlProductMsg xmlProductMsg = (XmlProductMsg) productDao
+					.readListOfKeys();
 			return xmlProductMsg;
 		}
 		return null;
 	}
 
-	public XmlUsersProductMsg getUsersByProductId (String productId)  {
+	public XmlUsersProductMsg getUsersByProductId(String productId) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("getUserByProduct " + productId);
 		}
@@ -92,18 +97,23 @@ public class UserProductServices  {
 		XmlProductMsg productMsg = new XmlProductMsg();
 		productMsg.setProduct(product);
 		Dao productDao = DaoFactory.getDAO(daoType.PRODUCT_DAO, productMsg);
-		XmlProductMsg xmlProductMsg = (XmlProductMsg)productDao.read();
+		XmlProductMsg xmlProductMsg = (XmlProductMsg) productDao.read();
 		usersProductMsg.setProduct(xmlProductMsg.getLOfProducts().get(0));
-		
+
 		XmlUserToProduct xmlUserToProduct = new XmlUserToProduct();
 		xmlUserToProduct.setProductId(productId);
 		xmlUserToProductMsg = new XmlUserToProductMsg(xmlUserToProduct);
 		xmlUserToProductMsg.setSearchField("PRODUCTID");
 		Dao userToProductDao = DaoFactory.getDAO(daoType.USER_TO_PRODUCT_DAO,
 				xmlUserToProductMsg);
-		XmlUserToProductMsg userToProductMsg = (XmlUserToProductMsg) userToProductDao.search();
-		List<XmlUserToProduct> lOfUserToProduct = userToProductMsg.getLOfXmlUserToProduct();
-
+		XmlUserToProductMsg userToProductMsg = (XmlUserToProductMsg) userToProductDao
+				.search();
+		if (userToProductMsg.getSuccess().equals("false")) {
+			usersProductMsg.setSuccess("false");
+			return usersProductMsg;
+		}
+		List<XmlUserToProduct> lOfUserToProduct = userToProductMsg
+				.getLOfXmlUserToProduct();
 		if (lOfUserToProduct.size() > 0) {
 			ArrayList<XmlRegisteredUser> lOfRegisteredUsers = new ArrayList<XmlRegisteredUser>();
 			Map<String, XmlUsersLinkedToProduct> mOfUsersLinkedToProduct = new HashMap<String, XmlUsersLinkedToProduct>();
@@ -111,8 +121,9 @@ public class UserProductServices  {
 				XmlUsersLinkedToProduct usersLinkedToProduct = new XmlUsersLinkedToProduct();
 				usersLinkedToProduct.setAddedDate(userToProduct.getCrDate());
 				usersLinkedToProduct.setUserId(userToProduct.getUserId());
-				mOfUsersLinkedToProduct.put(userToProduct.getUserId(), usersLinkedToProduct);
-				Login login = new Login(); 
+				mOfUsersLinkedToProduct.put(userToProduct.getUserId(),
+						usersLinkedToProduct);
+				XmlLogin login = new XmlLogin();
 				login.setUserId(userToProduct.getUserId());
 				XmlRegisteredUser registeredUser = new XmlRegisteredUser();
 				registeredUser.setLogin(login);
@@ -121,23 +132,34 @@ public class UserProductServices  {
 
 			XmlRegisteredUserMsg registeredUserMsg = new XmlRegisteredUserMsg();
 			registeredUserMsg.setLOfRegisteredUsers(lOfRegisteredUsers);
-			Dao registeredUserDao = DaoFactory.getDAO(daoType.REGISTERED_USER_DAO, registeredUserMsg);
-			XmlRegisteredUserMsg xmlRegisteredUserMsg = (XmlRegisteredUserMsg)registeredUserDao.readListOfKeys();
+			Dao registeredUserDao = DaoFactory.getDAO(
+					daoType.REGISTERED_USER_DAO, registeredUserMsg);
+			XmlRegisteredUserMsg xmlRegisteredUserMsg = (XmlRegisteredUserMsg) registeredUserDao
+					.readListOfKeys();
 			lOfRegisteredUsers = xmlRegisteredUserMsg.getLOfRegisteredUsers();
 			for (XmlRegisteredUser registeredUser : lOfRegisteredUsers) {
-				XmlUsersLinkedToProduct usersLinkedToProduct = mOfUsersLinkedToProduct.get(registeredUser.getLogin().getUserId());
+				XmlUsersLinkedToProduct usersLinkedToProduct = mOfUsersLinkedToProduct
+						.get(registeredUser.getLogin().getUserId());
 				usersLinkedToProduct.setEmail(registeredUser.getEmail());
-				usersLinkedToProduct.setFirstname(registeredUser.getFirstname());
+				usersLinkedToProduct
+						.setFirstname(registeredUser.getFirstname());
 				usersLinkedToProduct.setLastname(registeredUser.getLastname());
-				usersLinkedToProduct.setTelephone(registeredUser.getTelephone());
-				mOfUsersLinkedToProduct.put(registeredUser.getLogin().getUserId(), usersLinkedToProduct);
+				usersLinkedToProduct
+						.setTelephone(registeredUser.getTelephone());
+				mOfUsersLinkedToProduct.put(registeredUser.getLogin()
+						.getUserId(), usersLinkedToProduct);
 			}
-			ArrayList<XmlUsersLinkedToProduct> lOfXmlUsersLinkedToProduct = new ArrayList<XmlUsersLinkedToProduct> ();
-			for(String key: mOfUsersLinkedToProduct.keySet()) {
-				XmlUsersLinkedToProduct usersLinkedToProduct = mOfUsersLinkedToProduct.get(key);
+			ArrayList<XmlUsersLinkedToProduct> lOfXmlUsersLinkedToProduct = new ArrayList<XmlUsersLinkedToProduct>();
+			for (String key : mOfUsersLinkedToProduct.keySet()) {
+				XmlUsersLinkedToProduct usersLinkedToProduct = mOfUsersLinkedToProduct
+						.get(key);
 				lOfXmlUsersLinkedToProduct.add(usersLinkedToProduct);
 			}
-			usersProductMsg.setlOfXmlUsersLinkedToProduct(lOfXmlUsersLinkedToProduct);
+			usersProductMsg
+					.setlOfXmlUsersLinkedToProduct(lOfXmlUsersLinkedToProduct);
+			usersProductMsg.setSuccess("true");
+		} else {
+			usersProductMsg.setSuccess("false");
 		}
 		return usersProductMsg;
 	}

@@ -6,6 +6,7 @@ import com.braffa.sellem.hbn.Dao;
 import com.braffa.sellem.hbn.DaoFactory;
 import com.braffa.sellem.hbn.DaoFactory.daoType;
 import com.braffa.sellem.model.hbn.entity.Login;
+import com.braffa.sellem.model.xml.authentication.XmlLogin;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUser;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUserMsg;
 
@@ -44,7 +45,7 @@ public class RegisteredUserService {
 			logger.debug("deleteLogin");
 		}
 		XmlRegisteredUser registeredUser = new XmlRegisteredUser();
-		Login login = new Login();
+		XmlLogin login = new XmlLogin();
 		registeredUser.setLogin(login);
 		registeredUser.getLogin().setUserId(userId);
 		XmlRegisteredUserMsg xmlRegisteredUserMsg = new XmlRegisteredUserMsg(
@@ -60,7 +61,7 @@ public class RegisteredUserService {
 			logger.debug("remove");
 		}
 		XmlRegisteredUser registeredUser = new XmlRegisteredUser();
-		Login login = new Login();
+		XmlLogin login = new XmlLogin();
 		registeredUser.setLogin(login);
 		registeredUser.getLogin().setUserId(userId);
 		XmlRegisteredUserMsg xmlRegisteredUserMsg = new XmlRegisteredUserMsg(
@@ -91,7 +92,7 @@ public class RegisteredUserService {
 			logger.debug("getRegisteredUser");
 		}
 		XmlRegisteredUser registeredUser = new XmlRegisteredUser();
-		Login login = new Login();
+		XmlLogin login = new XmlLogin();
 		registeredUser.setLogin(login);
 		registeredUser.getLogin().setUserId(userId);
 		XmlRegisteredUserMsg xmlRegisteredUserMsg = new XmlRegisteredUserMsg(

@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.braffa.sellem.dao.utility.mysql.MySQLSetUp;
 import com.braffa.sellem.hbn.dao.authentication.RegisteredUserDao;
 import com.braffa.sellem.model.hbn.entity.Login;
+import com.braffa.sellem.model.xml.authentication.XmlLogin;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUser;
 import com.braffa.sellem.model.xml.authentication.XmlRegisteredUserMsg;
 import com.braffa.sellem.model.xml.product.XmlProduct;
@@ -75,7 +76,7 @@ public class RegisteredUserClientTest {
 		registeredUser.setLastname("Mills");
 		registeredUser.setTelephone("01388 445561");
 		registeredUser.setUpdDate(new Date());
-		registeredUser.setLogin(new Login());
+		registeredUser.setLogin(new XmlLogin());
 		registeredUser.getLogin().setUserId("gordon");
 		XmlRegisteredUserMsg xmlRegisteredUserMsg = new XmlRegisteredUserMsg(registeredUser);
 		
